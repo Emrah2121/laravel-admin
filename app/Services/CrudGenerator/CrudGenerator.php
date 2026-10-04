@@ -8,6 +8,7 @@ use App\Services\CrudGenerator\Generators\MigrationGenerator;
 use App\Services\CrudGenerator\Generators\ModelGenerator;
 use App\Services\CrudGenerator\Generators\RequestGenerator;
 use App\Services\CrudGenerator\Generators\ViewGenerator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -112,9 +113,27 @@ final class CrudGenerator
     }
 
     /**
+     * Two runs injecting into the same files at once could interleave, so
+     * generation is serialized.
+     *
      * @return array{created: string[], modified: string[], artisan: array<string, array{successful: bool, output: string}>}
      */
     public function generate(ModuleSpec $spec, bool $migrate = false, bool $seed = false): array
+    {
+        $lock = Cache::lock('crud-generator', 300);
+
+        if (!$lock->get()) {
+            throw new CrudGeneratorException('Another module is being generated. Try again in a moment.');
+        }
+
+        try {
+            return $this->run($spec, $migrate, $seed);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    private function run(ModuleSpec $spec, bool $migrate, bool $seed): array
     {
         if (($migrate || $seed) && !$this->artisanAllowed()) {
             throw new CrudGeneratorException('Running migrations or seeders is not allowed in this environment.');

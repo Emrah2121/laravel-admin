@@ -31,3 +31,7 @@ Decisions taken while building the generator. Conventions copied from Blog are d
 | 18 | All images of a module are shown in a single media card (`$model->files`). | `backend.includes.media` pushes its JS on every include, so including it once per image field would bind delete/cover handlers several times. |
 | 19 | Quill fields share one `quillOptions` object and one submit loop over `quills` keyed by input name. | Same toolbar and behaviour as Blog without repeating the config per field. |
 | 20 | Rich-text values echoed back into the editor are passed through `sanitize_html()`; stored values are sanitized by model mutators. | Blog echoes `old()` input raw. |
+| 21 | The preview stores the validated spec in the session under a one-time random token; the confirm step only posts the token and re-validates before writing. | The spec cannot be altered between preview and generation. |
+| 22 | Migrations/seeders run in a separate `php artisan` process after writing; failures are reported on the result page instead of rolling back the written files. | New classes and migrations must be loaded fresh; the code itself is already valid at that point. |
+| 23 | Generation holds a `crud-generator` cache lock. | Two concurrent runs could interleave injections into the same files. |
+| 24 | Generated FormRequests keep Blog's `authorize(): true` + controller Gate check. | Same authorization flow as Blog. |

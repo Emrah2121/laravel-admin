@@ -3,10 +3,12 @@
 namespace Tests\Feature\CrudGenerator;
 
 use App\Services\CrudGenerator\CrudGenerator;
+use App\Services\CrudGenerator\CrudGeneratorException;
 use App\Services\CrudGenerator\ModuleSpec;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Tests\TestCase;
@@ -108,6 +110,23 @@ class GeneratorOutputTest extends TestCase
         $errors = CrudGenerator::make()->validate($this->sampleSpec());
 
         $this->assertArrayHasKey('name', $errors);
+    }
+
+    public function test_concurrent_generation_is_refused(): void
+    {
+        $lock = Cache::lock('crud-generator', 10);
+        $lock->get();
+
+        try {
+            CrudGenerator::make()->generate($this->sampleSpec());
+            $this->fail('Expected the lock to block generation.');
+        } catch (CrudGeneratorException $e) {
+            $this->assertStringContainsString('Another module', $e->getMessage());
+        } finally {
+            $lock->release();
+        }
+
+        $this->assertFileDoesNotExist($this->sandboxPath('app/Models/Gadget.php'));
     }
 
     private function minimalSpec(): ModuleSpec
