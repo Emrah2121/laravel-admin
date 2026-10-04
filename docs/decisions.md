@@ -46,3 +46,4 @@ Decisions taken while building the generator. Conventions copied from Blog are d
 | 28 | Smart Seeder uses the CRUD generator's middleware/flag (developer-only, local by default). | Both tools write files into the codebase. |
 | 29 | Generated seeders are thin classes that call `SmartSeederRunner` with their JSON file; records are skipped when the slug (or default-language title) exists. | Logic stays testable in one place; re-running a seeder never duplicates data. |
 | 30 | Flash messages built from API errors or Artisan output are stripped of quotes, backslashes, angle brackets and line breaks. | The existing `notify()` helper prints them unescaped into a JavaScript string. |
+| 31 | Photos come from Pixabay instead of Pexels (decision 26): Pexels paused new API key issuance. A new migration renames `pexels_api_key` to `pixabay_api_key`. | Pixabay has open key issuance, real photos and topic search; images are downloaded, as its terms require. |

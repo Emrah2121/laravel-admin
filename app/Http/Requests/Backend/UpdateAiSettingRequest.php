@@ -16,7 +16,7 @@ class UpdateAiSettingRequest extends FormRequest
         return [
             'gemini_api_key' => ['nullable', 'string', 'max:500'],
             'gemini_model' => ['required', 'string', 'max:100', 'regex:/^[a-z0-9.\-]+$/'],
-            'pexels_api_key' => ['nullable', 'string', 'max:500'],
+            'pixabay_api_key' => ['nullable', 'string', 'max:500'],
         ];
     }
 }

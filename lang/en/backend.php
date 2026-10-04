@@ -213,7 +213,7 @@ return array(
             'settings' => 'AI settings',
             'gemini_api_key' => 'Gemini API key',
             'gemini_model' => 'Gemini model',
-            'pexels_api_key' => 'Pexels API key',
+            'pixabay_api_key' => 'Pixabay API key',
             'key_saved' => 'Saved',
             'key_missing' => 'Not set',
             'keys_hint' => 'Keys are stored encrypted and never shown again. Leave a key empty to keep the current one.',

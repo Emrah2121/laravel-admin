@@ -57,12 +57,12 @@
                                 </div>
                                 <div class="mb-5">
                                     <label class="form-label">
-                                        @lang('backend.smart_seeder.pexels_api_key')
-                                        <span class="badge {{ $settings->hasPexelsKey() ? 'badge-light-success' : 'badge-light-danger' }} ms-2">
-                                            {{ $settings->hasPexelsKey() ? trans('backend.smart_seeder.key_saved') : trans('backend.smart_seeder.key_missing') }}
+                                        @lang('backend.smart_seeder.pixabay_api_key')
+                                        <span class="badge {{ $settings->hasPixabayKey() ? 'badge-light-success' : 'badge-light-danger' }} ms-2">
+                                            {{ $settings->hasPixabayKey() ? trans('backend.smart_seeder.key_saved') : trans('backend.smart_seeder.key_missing') }}
                                         </span>
                                     </label>
-                                    <input type="password" name="pexels_api_key" class="form-control" autocomplete="new-password" />
+                                    <input type="password" name="pixabay_api_key" class="form-control" autocomplete="new-password" />
                                 </div>
                                 <div class="text-muted fs-7 mb-5">@lang('backend.smart_seeder.keys_hint')</div>
                                 <button type="submit" class="btn btn-light-primary">@lang('backend.buttons.save')</button>

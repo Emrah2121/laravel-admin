@@ -77,7 +77,7 @@ class SmartSeederController extends Controller
     {
         $smartSeeder = SmartSeeder::make();
 
-        abort_if(!$smartSeeder->find($seeder) || !preg_match('/^\d+_[a-z0-9_]+\.jpg$/', $file), 404);
+        abort_if(!$smartSeeder->find($seeder) || !preg_match('/^\d+_[a-z0-9_]+\.(jpg|png)$/', $file), 404);
 
         $path = $smartSeeder->assetPath($seeder, $file);
 

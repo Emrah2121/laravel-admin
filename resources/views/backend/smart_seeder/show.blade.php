@@ -94,7 +94,7 @@
                                                     <div class="text-muted fs-8">
                                                         @lang('backend.smart_seeder.photo_by')
                                                         <a href="{{ $credits[$path]['photographer_url'] }}" target="_blank" rel="noopener">{{ $credits[$path]['photographer'] }}</a>
-                                                        · <a href="{{ $credits[$path]['url'] }}" target="_blank" rel="noopener">Pexels</a>
+                                                        · <a href="{{ $credits[$path]['url'] }}" target="_blank" rel="noopener">Pixabay</a>
                                                     </div>
                                                 @endif
                                             </div>

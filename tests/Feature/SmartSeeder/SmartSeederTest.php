@@ -43,7 +43,7 @@ class SmartSeederTest extends TestCase
 
         $this->developer = $this->makeAdmin(Admin::DEVELOPER_ROLE, 'developer@example.com');
 
-        AiSetting::current()->update(['gemini_api_key' => 'gemini-secret-key', 'pexels_api_key' => 'pexels-secret-key']);
+        AiSetting::current()->update(['gemini_api_key' => 'gemini-secret-key', 'pixabay_api_key' => 'pixabay-secret-key']);
     }
 
     private function makeAdmin(string $roleName, string $email): Admin
@@ -98,18 +98,18 @@ class SmartSeederTest extends TestCase
             'generativelanguage.googleapis.com/*' => Http::response([
                 'candidates' => [['content' => ['parts' => [['text' => json_encode($aiResponse)]]], 'finishReason' => 'STOP']],
             ]),
-            'api.pexels.com/*' => function (Request $request) {
+            'pixabay.com/api/*' => function (Request $request) {
                 $seed = crc32($request->url());
 
-                return Http::response(['photos' => [[
+                return Http::response(['hits' => [[
                     'id' => $seed,
-                    'url' => "https://www.pexels.com/photo/{$seed}/",
-                    'photographer' => 'Jane Doe',
-                    'photographer_url' => 'https://www.pexels.com/@jane',
-                    'src' => ['large' => "https://images.pexels.com/photos/{$seed}/large.jpeg"],
+                    'pageURL' => "https://pixabay.com/photos/{$seed}/",
+                    'user' => 'JaneDoe',
+                    'user_id' => 42,
+                    'largeImageURL' => "https://pixabay.com/get/{$seed}_1280.jpg",
                 ]]]);
             },
-            'images.pexels.com/*' => Http::response($image, 200, ['Content-Type' => 'image/jpeg']),
+            'pixabay.com/get/*' => Http::response($image, 200, ['Content-Type' => 'image/jpeg']),
         ]);
     }
 
@@ -172,11 +172,16 @@ class SmartSeederTest extends TestCase
                 && str_contains($request['contents'][0]['parts'][0]['text'], 'Programming services');
         });
 
+        Http::assertSent(fn (Request $request) => str_starts_with($request->url(), 'https://pixabay.com/api/')
+            && $request['key'] === 'pixabay-secret-key'
+            && $request['q'] === 'programmer laptop 1'
+            && $request['image_type'] === 'photo');
+
         $this->actingAs($this->developer, 'admin')
             ->get(route('backend.smart_seeder.show', ['seeder' => $class]))
             ->assertOk()
             ->assertSee('Web development 1 en')
-            ->assertSee('Jane Doe');
+            ->assertSee('JaneDoe');
 
         $this->actingAs($this->developer, 'admin')
             ->get(route('backend.smart_seeder.asset', ['seeder' => $class, 'file' => '1_images.jpg']))
@@ -252,12 +257,12 @@ class SmartSeederTest extends TestCase
 
     public function test_missing_keys_block_generation(): void
     {
-        AiSetting::current()->update(['pexels_api_key' => null]);
+        AiSetting::current()->update(['pixabay_api_key' => null]);
         Http::fake();
 
         $this->actingAs($this->developer, 'admin')
             ->post(route('backend.smart_seeder.store'), ['module' => 'Blog', 'count' => 2, 'instruction' => 'Anything'])
-            ->assertSessionHas('error', fn ($message) => str_contains($message, 'Pexels'));
+            ->assertSessionHas('error', fn ($message) => str_contains($message, 'Pixabay'));
 
         Http::assertNothingSent();
     }
@@ -265,12 +270,12 @@ class SmartSeederTest extends TestCase
     public function test_settings_are_encrypted_and_never_rendered(): void
     {
         $this->actingAs($this->developer, 'admin')
-            ->put(route('backend.smart_seeder.settings'), ['gemini_api_key' => 'new-gemini-key', 'gemini_model' => 'gemini-3.5-flash-lite', 'pexels_api_key' => ''])
+            ->put(route('backend.smart_seeder.settings'), ['gemini_api_key' => 'new-gemini-key', 'gemini_model' => 'gemini-3.5-flash-lite', 'pixabay_api_key' => ''])
             ->assertRedirect(route('backend.smart_seeder.index'));
 
         $settings = AiSetting::current();
         $this->assertSame('new-gemini-key', $settings->gemini_api_key);
-        $this->assertSame('pexels-secret-key', $settings->pexels_api_key);
+        $this->assertSame('pixabay-secret-key', $settings->pixabay_api_key);
         $this->assertSame('gemini-3.5-flash-lite', $settings->gemini_model);
         $this->assertStringNotContainsString('new-gemini-key', DB::table('ai_settings')->value('gemini_api_key'));
 
@@ -278,7 +283,7 @@ class SmartSeederTest extends TestCase
             ->get(route('backend.smart_seeder.index'))
             ->assertOk()
             ->assertDontSee('new-gemini-key')
-            ->assertDontSee('pexels-secret-key');
+            ->assertDontSee('pixabay-secret-key');
     }
 
     public function test_access_is_developer_only_and_follows_the_generator_flag(): void

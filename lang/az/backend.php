@@ -213,7 +213,7 @@ return array(
             'settings' => 'AI tənzimləmələri',
             'gemini_api_key' => 'Gemini API açarı',
             'gemini_model' => 'Gemini modeli',
-            'pexels_api_key' => 'Pexels API açarı',
+            'pixabay_api_key' => 'Pixabay API açarı',
             'key_saved' => 'Saxlanılıb',
             'key_missing' => 'Daxil edilməyib',
             'keys_hint' => 'Açarlar şifrələnmiş saxlanılır və yenidən göstərilmir. Mövcud açarı saxlamaq üçün sahəni boş buraxın.',

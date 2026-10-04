@@ -213,7 +213,7 @@ return array(
             'settings' => 'Настройки AI',
             'gemini_api_key' => 'API-ключ Gemini',
             'gemini_model' => 'Модель Gemini',
-            'pexels_api_key' => 'API-ключ Pexels',
+            'pixabay_api_key' => 'API-ключ Pixabay',
             'key_saved' => 'Сохранён',
             'key_missing' => 'Не задан',
             'keys_hint' => 'Ключи хранятся в зашифрованном виде и больше не отображаются. Оставьте поле пустым, чтобы сохранить текущий ключ.',

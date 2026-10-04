@@ -18,7 +18,7 @@ use Throwable;
 
 /**
  * Asks Gemini for records matching a module's columns and active locales,
- * downloads Pexels photos for its image fields and writes a regular seeder
+ * downloads Pixabay photos for its image fields and writes a regular seeder
  * (class + JSON data + image assets) under database/seeders/Smart.
  */
 final class SmartSeeder
@@ -32,7 +32,7 @@ final class SmartSeeder
         private readonly StubRenderer $renderer,
         private readonly SeedableModules $modules,
         private readonly GeminiClient $gemini,
-        private readonly PexelsClient $pexels,
+        private readonly PixabayClient $pixabay,
     ) {}
 
     public static function make(): self
@@ -44,7 +44,7 @@ final class SmartSeeder
             new StubRenderer(base_path('stubs/smart-seeder')),
             new SeedableModules(new Manifest($writer->path(config('crud-generator.manifest')))),
             app(GeminiClient::class),
-            app(PexelsClient::class),
+            app(PixabayClient::class),
         );
     }
 
@@ -67,8 +67,8 @@ final class SmartSeeder
             throw new SmartSeederException('Add a Gemini API key in the Smart Seeder settings first.');
         }
 
-        if ($spec->imageFields() && !$settings->hasPexelsKey()) {
-            throw new SmartSeederException('This module has image fields: add a Pexels API key in the settings first.');
+        if ($spec->imageFields() && !$settings->hasPixabayKey()) {
+            throw new SmartSeederException('This module has image fields: add a Pixabay API key in the settings first.');
         }
 
         if ($locales->isEmpty()) {
@@ -96,7 +96,7 @@ final class SmartSeeder
         foreach ($records as $index => &$record) {
             foreach ($spec->imageFields() as $field) {
                 $query = $record['image_queries'][$field->name] ?? '';
-                $photo = $this->pexels->photo($settings->pexels_api_key, $query, $usedPhotos);
+                $photo = $this->pixabay->photo($settings->pixabay_api_key, $query, $usedPhotos);
 
                 if (!$photo) {
                     $warnings[] = "No photo found for \"{$query}\" (record " . ($index + 1) . ').';
@@ -105,10 +105,10 @@ final class SmartSeeder
                 }
 
                 $usedPhotos[] = $photo['id'];
-                $path = "assets/{$class}/" . ($index + 1) . "_{$field->name}.jpg";
+                $path = "assets/{$class}/" . ($index + 1) . "_{$field->name}.{$photo['extension']}";
                 $operations[] = FileOperation::create(self::DIRECTORY . '/' . $path, $photo['contents']);
                 $record['images'][$field->name] = [$path];
-                $credits[] = Arr::only($photo, ['photographer', 'photographer_url', 'url']) + ['file' => $path];
+                $credits[] = Arr::only($photo, ['photographer', 'photographer_url', 'url']) + ['file' => $path, 'source' => 'Pixabay'];
             }
 
             unset($record['image_queries']);

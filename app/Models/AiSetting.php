@@ -11,14 +11,14 @@ class AiSetting extends Model
     protected $fillable = [
         'gemini_api_key',
         'gemini_model',
-        'pexels_api_key',
+        'pixabay_api_key',
     ];
 
-    protected $hidden = ['gemini_api_key', 'pexels_api_key'];
+    protected $hidden = ['gemini_api_key', 'pixabay_api_key'];
 
     protected $casts = [
         'gemini_api_key' => 'encrypted',
-        'pexels_api_key' => 'encrypted',
+        'pixabay_api_key' => 'encrypted',
     ];
 
     public static function current(): self
@@ -33,8 +33,8 @@ class AiSetting extends Model
         return filled($this->gemini_api_key);
     }
 
-    public function hasPexelsKey(): bool
+    public function hasPixabayKey(): bool
     {
-        return filled($this->pexels_api_key);
+        return filled($this->pixabay_api_key);
     }
 }
