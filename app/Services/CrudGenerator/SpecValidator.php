@@ -210,6 +210,12 @@ final class SpecValidator
             $conflicts[] = "Translation key [backend.titles.{$spec->key()}] already exists.";
         }
 
+        foreach ($spec->fields as $field) {
+            if (trans()->has("backend.labels.{$spec->labelKey($field)}", null, false)) {
+                $conflicts[] = "Translation key [backend.labels.{$spec->labelKey($field)}] already exists.";
+            }
+        }
+
         if ($this->manifest->has($spec->name)) {
             $conflicts[] = "Module [{$spec->name}] was already generated.";
         }

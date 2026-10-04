@@ -64,8 +64,8 @@ final class FileOperation
 
     public function hasRegion(string $current): bool
     {
-        // "Product" must not match the region of "ProductCategory".
-        return preg_match('/' . preg_quote($this->startMarker(), '/') . '(?![A-Za-z0-9_])/', $current) === 1;
+        // The marker must end its line, so "Product" never matches "ProductCategory" or "Product labels".
+        return preg_match('/' . preg_quote($this->startMarker(), '/') . '\r?$/m', $current) === 1;
     }
 
     public function anchorCount(string $current): int
@@ -99,8 +99,14 @@ final class FileOperation
         if ($this->before) {
             $lineStart = strrpos(substr($current, 0, $position), "\n");
             $offset = $lineStart === false ? 0 : $lineStart + 1;
+
+            // Keep the blank line that separated the anchor from the code above it.
+            if (str_ends_with(substr($current, 0, $offset), $eol . $eol)) {
+                $region .= $eol;
+            }
         } else {
-            $lineEnd = strpos($current, "\n", $position);
+            // Anchors may span several lines; insert after the line where the anchor ends.
+            $lineEnd = strpos($current, "\n", $position + strlen($this->anchor) - 1);
             $offset = $lineEnd === false ? strlen($current) : $lineEnd + 1;
 
             if ($lineEnd === false) {

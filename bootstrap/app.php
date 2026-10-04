@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureCrudGeneratorAccess;
 use App\Http\Middleware\Localization;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'lang' => Localization::class,
+            'crud-generator' => EnsureCrudGeneratorAccess::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('backend.login.form'));

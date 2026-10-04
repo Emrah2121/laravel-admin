@@ -3,6 +3,7 @@
 namespace App\Services\CrudGenerator;
 
 use App\Services\CrudGenerator\Generators\ControllerGenerator;
+use App\Services\CrudGenerator\Generators\InjectionGenerator;
 use App\Services\CrudGenerator\Generators\MigrationGenerator;
 use App\Services\CrudGenerator\Generators\ModelGenerator;
 use App\Services\CrudGenerator\Generators\RequestGenerator;
@@ -53,6 +54,7 @@ final class CrudGenerator
             new RequestGenerator($renderer),
             new ControllerGenerator($renderer),
             new ViewGenerator($renderer),
+            new InjectionGenerator(),
         ];
     }
 

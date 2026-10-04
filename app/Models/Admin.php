@@ -39,6 +39,11 @@ class Admin extends Authenticatable
         return optional($this->role)->name === self::DEVELOPER_ROLE;
     }
 
+    public function canUseCrudGenerator(): bool
+    {
+        return config('crud-generator.enabled') && $this->isDeveloper();
+    }
+
     public function setPasswordAttribute($value)
     {
         if (!is_null($value)) {
