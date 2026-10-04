@@ -1,0 +1,21 @@
+{
+    "emptyTable": "Cədvəldə məlumat yoxdur",
+    "info": "_TOTAL_ qeyddən _START_ - _END_ göstərilir",
+    "infoEmpty": "0 qeyddən 0 - 0 göstərilir",
+    "infoFiltered": "(_MAX_ qeyd arasından süzülüb)",
+    "lengthMenu": "_MENU_ qeyd göstər",
+    "loadingRecords": "Yüklənir...",
+    "processing": "Emal edilir...",
+    "search": "Axtar:",
+    "zeroRecords": "Uyğun nəticə tapılmadı",
+    "paginate": {
+        "first": "İlk",
+        "last": "Son",
+        "next": "Növbəti",
+        "previous": "Əvvəlki"
+    },
+    "aria": {
+        "sortAscending": ": artan sırala",
+        "sortDescending": ": azalan sırala"
+    }
+}
