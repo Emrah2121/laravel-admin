@@ -110,11 +110,6 @@ final class ModuleSpec
         return Str::camel($this->name);
     }
 
-    public function pluralVariable(): string
-    {
-        return Str::camel($this->plural);
-    }
-
     public function morphAlias(): string
     {
         return $this->snake();
@@ -197,15 +192,18 @@ final class ModuleSpec
     }
 
     /**
+     * DataTables columns, in the order Blog's index uses.
+     *
      * @return string[]
      */
-    public function baseColumns(): array
+    public function datatableColumns(): array
     {
-        return array_keys(array_filter([
-            'slug' => $this->hasSlug,
-            'publish_date' => $this->hasPublishDate,
-            'order' => $this->hasOrder,
-            'status' => $this->hasStatus,
+        return array_values(array_filter([
+            'checkbox',
+            $this->morphAlias(),
+            $this->hasStatus ? 'status' : null,
+            $this->hasPublishDate ? 'publish_date' : null,
+            'actions',
         ]));
     }
 }

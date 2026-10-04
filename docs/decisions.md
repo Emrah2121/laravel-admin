@@ -25,3 +25,9 @@ Decisions taken while building the generator. Conventions copied from Blog are d
 | 12 | Manifest stored at `database/crud-generator/manifest.json`. | Versioned with the code it describes and survives DB resets. |
 | 13 | "Remove generated module" is not part of v1; the manifest keeps the data needed to add it. | Marked optional in the brief. |
 | 14 | Preview diffs are rendered as line insertions with context; no diff package. | Injections only insert lines. |
+| 15 | `slug`, `status`, `order`, `publish_date` are always reserved as field names, even when the base option is off. | Keeps one simple rule; the base option re-enables them. |
+| 16 | Generated index eager-loads `files` when the module has image fields (`with(['translation', 'files'])`). | Blog's `dataTable()` reads `cover_image` per row without eager loading (N+1). |
+| 17 | The datatable title is escaped with `e()`; translatable/main inputs use `old('field', stored)`; the show page's edit button is wrapped in `@can`. | Small safety/UX fixes over Blog that keep the same structure. |
+| 18 | All images of a module are shown in a single media card (`$model->files`). | `backend.includes.media` pushes its JS on every include, so including it once per image field would bind delete/cover handlers several times. |
+| 19 | Quill fields share one `quillOptions` object and one submit loop over `quills` keyed by input name. | Same toolbar and behaviour as Blog without repeating the config per field. |
+| 20 | Rich-text values echoed back into the editor are passed through `sanitize_html()`; stored values are sanitized by model mutators. | Blog echoes `old()` input raw. |

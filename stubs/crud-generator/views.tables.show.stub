@@ -1,0 +1,61 @@
+<div class="d-flex flex-column flex-lg-row">
+    <div class="d-flex flex-column gap-7 gap-lg-10 w-100 w-lg-300px mb-7 me-lg-10">
+[% show_cover %]
+        <div class="card card-flush py-4">
+            <div class="card-header">
+                <div class="card-title">
+                    <h2>@lang('backend.labels.details')</h2>
+                </div>
+            </div>
+            <div class="card-body pt-0 fs-6">
+[% show_details %]
+                <div class="mb-5">
+                    <div class="fw-bold text-gray-800">@lang('backend.labels.created_at')</div>
+                    <div class="text-gray-600">{{ optional($[% variable %]->created_at)->format('d.m.Y H:i') ?? '—' }}</div>
+                </div>
+                <div class="mb-5">
+                    <div class="fw-bold text-gray-800">@lang('backend.labels.updated_at')</div>
+                    <div class="text-gray-600">{{ optional($[% variable %]->updated_at)->format('d.m.Y H:i') ?? '—' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10">
+        <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-n2">
+            @foreach ($langs as $lang)
+                <li class="nav-item">
+                    <a class="nav-link text-active-primary pb-4 @if($loop->first) active @endif"
+                       data-bs-toggle="tab" href="#kt_[% morph_alias %]_lang_{{ $lang->code }}">
+                        {{ $lang->name }}
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+
+        <div class="tab-content">
+            @foreach ($langs as $lang)
+                <div class="tab-pane fade @if($loop->first) show active @endif" id="kt_[% morph_alias %]_lang_{{ $lang->code }}" role="tabpanel">
+                    <div class="d-flex flex-column gap-7 gap-lg-10">
+                        <div class="card card-flush py-4">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <h2>{{ $lang->name }} @lang('backend.labels.content')</h2>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0">
+                                @if($translations[$lang->code])
+[% show_translations %]
+                                @else
+                                    <div class="text-muted fst-italic">@lang('backend.messages.error.not_found')</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+[% show_main %]
+[% show_media %]
+    </div>
+</div>

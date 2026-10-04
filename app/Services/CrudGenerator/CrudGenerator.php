@@ -2,6 +2,11 @@
 
 namespace App\Services\CrudGenerator;
 
+use App\Services\CrudGenerator\Generators\ControllerGenerator;
+use App\Services\CrudGenerator\Generators\MigrationGenerator;
+use App\Services\CrudGenerator\Generators\ModelGenerator;
+use App\Services\CrudGenerator\Generators\RequestGenerator;
+use App\Services\CrudGenerator\Generators\ViewGenerator;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -31,7 +36,7 @@ final class CrudGenerator
             $writer,
             new SpecValidator($writer, $manifest),
             $manifest,
-            self::generators($renderer, $writer),
+            self::generators($renderer),
             $manifestPath,
             $stubsPath . DIRECTORY_SEPARATOR . 'pint.json',
         );
@@ -40,9 +45,15 @@ final class CrudGenerator
     /**
      * @return Generator[]
      */
-    private static function generators(StubRenderer $renderer, Writer $writer): array
+    private static function generators(StubRenderer $renderer): array
     {
-        return [];
+        return [
+            new MigrationGenerator($renderer),
+            new ModelGenerator($renderer),
+            new RequestGenerator($renderer),
+            new ControllerGenerator($renderer),
+            new ViewGenerator($renderer),
+        ];
     }
 
     public function writer(): Writer

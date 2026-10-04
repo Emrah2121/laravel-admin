@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Requests\Backend;
+
+use App\Rules\ValidImageMimeTypeRule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
+
+class StoreGadgetRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        $rules = [];
+
+        foreach (active_langs() as $lang) {
+            $rules[] = [
+                'title:' . $lang->code => ['required', 'string', 'max:200'],
+                'body:' . $lang->code => ['required', 'string'],
+                'summary:' . $lang->code => ['nullable', 'string'],
+            ];
+        }
+
+        $rules[] = [
+            'slug' => ['required', 'string', 'max:255', Rule::unique('gadgets', 'slug')],
+            'publish_date' => ['required', 'date'],
+            'sku' => ['required', 'string', 'max:255'],
+            'notes' => ['nullable', 'string'],
+            'order' => ['nullable', 'integer'],
+            'status' => ['required', 'boolean'],
+            'cover' => ['nullable', 'array'],
+            'cover.*' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048', new ValidImageMimeTypeRule()],
+        ];
+
+        return Arr::collapse($rules);
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'cover.*' => trans('backend.labels.gadgets_cover'),
+        ];
+    }
+}

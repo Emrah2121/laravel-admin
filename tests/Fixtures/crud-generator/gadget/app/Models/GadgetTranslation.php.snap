@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class GadgetTranslation extends Model
+{
+    protected $guarded = [];
+
+    public $timestamps = false;
+
+    public function setBodyAttribute($value)
+    {
+        $this->attributes['body'] = sanitize_html($value);
+    }
+}

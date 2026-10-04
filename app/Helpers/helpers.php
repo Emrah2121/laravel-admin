@@ -3,6 +3,8 @@
 use App\Models\Language;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 if (!function_exists('locale')) {
     function locale()
@@ -191,5 +193,29 @@ if (!function_exists('translation_first')) {
         return $translations
             ? $translations->where('locale', locale())->first() ?? $translations->first()
             : null;
+    }
+}
+
+if (!function_exists('sanitize_html')) {
+    function sanitize_html($html)
+    {
+        if ($html === null || $html === '') {
+            return $html;
+        }
+
+        // Quill output: alignment classes, list types, base64 images and video iframes.
+        $config = (new HtmlSanitizerConfig())
+            ->allowSafeElements()
+            ->allowAttribute('class', '*')
+            ->allowAttribute('data-list', 'li')
+            ->allowElement('iframe', ['src', 'class', 'frameborder', 'allowfullscreen'])
+            ->forceAttribute('iframe', 'sandbox', 'allow-scripts allow-same-origin allow-popups allow-presentation')
+            ->allowLinkSchemes(['http', 'https', 'mailto', 'tel'])
+            ->allowMediaSchemes(['http', 'https', 'data'])
+            ->allowRelativeLinks()
+            ->allowRelativeMedias()
+            ->withMaxInputLength(-1);
+
+        return (new HtmlSanitizer($config))->sanitize($html);
     }
 }

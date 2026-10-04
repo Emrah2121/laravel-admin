@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\DocumentTrait;
+use App\Traits\SpatieLogsActivity;
+use App\Traits\TranslationTrait;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\App;
+
+class [% class %] extends Model
+{
+    use TranslationTrait, DocumentTrait, SpatieLogsActivity;
+
+    protected $guarded = [];
+[% casts %]
+[% scopes %]
+    public function translations(): HasMany
+    {
+        return $this->hasMany([% translation_class %]::class);
+    }
+
+    public function translation(): HasOne
+    {
+        return $this->hasOne([% translation_class %]::class)
+            ->where('locale', App::getLocale());
+    }
+[% accessors %]
+[% mutators %]
+}

@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('gadget_translations', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('gadget_id');
+            $table->string('locale', 10);
+            $table->string('title', 200);
+            $table->longText('body')->nullable();
+            $table->text('summary')->nullable();
+
+            $table->unique(['gadget_id', 'locale']);
+            $table->foreign('gadget_id')->references('id')->on('gadgets')->onUpdate('restrict')->onDelete('cascade');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('gadget_translations');
+    }
+};
