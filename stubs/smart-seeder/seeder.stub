@@ -1,0 +1,16 @@
+<?php
+
+namespace Database\Seeders\Smart;
+
+use App\Services\SmartSeeder\SmartSeederRunner;
+use Illuminate\Database\Seeder;
+
+class [% class %] extends Seeder
+{
+    public function run(SmartSeederRunner $runner): void
+    {
+        $result = $runner->run(__DIR__ . '/data/[% class %].json');
+
+        $this->command?->info("Created: {$result['created']}, skipped: {$result['skipped']}");
+    }
+}

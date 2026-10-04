@@ -14,6 +14,7 @@ use App\Http\Controllers\Backend\PermissionController;
 use App\Http\Controllers\Backend\ProfileController;
 use App\Http\Controllers\Backend\RoleController;
 use App\Http\Controllers\Backend\SettingController;
+use App\Http\Controllers\Backend\SmartSeederController;
 use Illuminate\Support\Facades\Route;
 
 Route::fallback(function () {
@@ -63,5 +64,14 @@ Route::group(['middleware' => ['auth:admin']], function () {
         Route::post('/preview', [CrudGeneratorController::class, 'preview'])->name('preview');
         Route::post('/', [CrudGeneratorController::class, 'store'])->name('store');
         Route::get('/{module}', [CrudGeneratorController::class, 'show'])->name('show')->where('module', '[A-Za-z0-9]+');
+    });
+
+    Route::middleware('crud-generator')->prefix('smart-seeder')->name('smart_seeder.')->group(function () {
+        Route::get('/', [SmartSeederController::class, 'index'])->name('index');
+        Route::put('/settings', [SmartSeederController::class, 'settings'])->name('settings');
+        Route::post('/', [SmartSeederController::class, 'store'])->name('store');
+        Route::get('/{seeder}', [SmartSeederController::class, 'show'])->name('show')->where('seeder', '[A-Za-z0-9]+');
+        Route::post('/{seeder}/run', [SmartSeederController::class, 'run'])->name('run')->where('seeder', '[A-Za-z0-9]+');
+        Route::get('/{seeder}/assets/{file}', [SmartSeederController::class, 'asset'])->name('asset')->where('seeder', '[A-Za-z0-9]+');
     });
 });

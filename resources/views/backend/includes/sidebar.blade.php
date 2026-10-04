@@ -184,6 +184,16 @@
                         <span class="menu-title">@lang('backend.titles.crud_generator')</span>
                     </a>
                 </div>
+
+                <div class="menu-item">
+                    <a href="{{ route('backend.smart_seeder.index') }}"
+                        class="menu-link {{ request()->routeIs('backend.smart_seeder.*') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i class="ki-outline ki-abstract-26 fs-2"></i>
+                        </span>
+                        <span class="menu-title">@lang('backend.titles.smart_seeder')</span>
+                    </a>
+                </div>
             @endif
         </div>
     </div>

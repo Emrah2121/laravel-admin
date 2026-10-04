@@ -35,3 +35,14 @@ Decisions taken while building the generator. Conventions copied from Blog are d
 | 22 | Migrations/seeders run in a separate `php artisan` process after writing; failures are reported on the result page instead of rolling back the written files. | New classes and migrations must be loaded fresh; the code itself is already valid at that point. |
 | 23 | Generation holds a `crud-generator` cache lock. | Two concurrent runs could interleave injections into the same files. |
 | 24 | Generated FormRequests keep Blog's `authorize(): true` + controller Gate check. | Same authorization flow as Blog. |
+
+## Smart Seeder
+
+| # | Decision | Reason |
+|---|---|---|
+| 25 | AI provider is Google Gemini (free tier), called with Laravel's `Http` client (`generateContent` + `responseSchema`); no new Composer package. | Chosen by the project owner; the free tier needs no billing. `GeminiClient` is the only provider-specific class. |
+| 26 | Photos come from Pexels search on an English query the AI writes per record; files are stored with the seeder. | Real, topic-matching photos; the seeder stays reproducible offline. |
+| 27 | Gemini/Pexels keys live in `ai_settings` with `encrypted` casts, edited on the Smart Seeder page. | Same pattern as the reCAPTCHA keys in `security_settings`. |
+| 28 | Smart Seeder uses the CRUD generator's middleware/flag (developer-only, local by default). | Both tools write files into the codebase. |
+| 29 | Generated seeders are thin classes that call `SmartSeederRunner` with their JSON file; records are skipped when the slug (or default-language title) exists. | Logic stays testable in one place; re-running a seeder never duplicates data. |
+| 30 | Flash messages built from API errors or Artisan output are stripped of quotes, backslashes, angle brackets and line breaks. | The existing `notify()` helper prints them unescaped into a JavaScript string. |
