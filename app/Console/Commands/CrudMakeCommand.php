@@ -65,10 +65,10 @@ class CrudMakeCommand extends Command
             $this->line("<comment>modified</comment> {$file}");
         }
 
-        foreach ($result['artisan'] as $command => $output) {
+        foreach ($result['artisan'] as $command => $run) {
             $this->newLine();
-            $this->line("<info>{$command}</info>");
-            $this->line($output);
+            $this->line($run['successful'] ? "<info>{$command}</info>" : "<error>{$command} failed</error>");
+            $this->line($run['output']);
         }
 
         $this->newLine();

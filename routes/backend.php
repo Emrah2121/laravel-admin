@@ -4,6 +4,7 @@ use App\Http\Controllers\Backend\AdminController;
 use App\Http\Controllers\Backend\AdminLangController;
 use App\Http\Controllers\Backend\AuthController;
 use App\Http\Controllers\Backend\BlogController;
+use App\Http\Controllers\Backend\CrudGeneratorController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\DocumentsController;
 use App\Http\Controllers\Backend\LanguageController;
@@ -51,4 +52,12 @@ Route::group(['middleware' => ['auth:admin']], function () {
 
     Route::post('/documents/{document}/delete', [DocumentsController::class, 'deleteDocument'])->name('delete.document');
     Route::post('/documents/{document}/set-status', [DocumentsController::class, 'setStatus'])->name('setStatus.document');
+
+    Route::middleware('crud-generator')->prefix('crud-generator')->name('crud_generator.')->group(function () {
+        Route::get('/', [CrudGeneratorController::class, 'index'])->name('index');
+        Route::get('/create', [CrudGeneratorController::class, 'create'])->name('create');
+        Route::post('/preview', [CrudGeneratorController::class, 'preview'])->name('preview');
+        Route::post('/', [CrudGeneratorController::class, 'store'])->name('store');
+        Route::get('/{module}', [CrudGeneratorController::class, 'show'])->name('show')->where('module', '[A-Za-z0-9]+');
+    });
 });

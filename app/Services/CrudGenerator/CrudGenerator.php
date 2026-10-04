@@ -112,7 +112,7 @@ final class CrudGenerator
     }
 
     /**
-     * @return array{created: string[], modified: string[], artisan: array<string, string>}
+     * @return array{created: string[], modified: string[], artisan: array<string, array{successful: bool, output: string}>}
      */
     public function generate(ModuleSpec $spec, bool $migrate = false, bool $seed = false): array
     {
@@ -147,7 +147,12 @@ final class CrudGenerator
             $this->lint(array_merge($result['created'], $result['modified']));
         });
 
+        // Files are written at this point; Artisan failures are reported, not rolled back.
         $result['artisan'] = [];
+
+        if (app()->routesAreCached()) {
+            $result['artisan']['route:clear'] = $this->artisan(['route:clear']);
+        }
 
         if ($migrate) {
             $migrations = array_values(array_filter($result['created'], fn ($path) => str_starts_with($path, 'database/migrations/')));
@@ -204,15 +209,17 @@ final class CrudGenerator
         }
     }
 
-    private function artisan(array $arguments): string
+    /**
+     * @return array{successful: bool, output: string}
+     */
+    private function artisan(array $arguments): array
     {
         $process = Process::path(base_path())->timeout(300)->run(array_merge([$this->php(), 'artisan'], $arguments));
 
-        if (!$process->successful()) {
-            throw new CrudGeneratorException('Artisan ' . $arguments[0] . ' failed: ' . trim($process->errorOutput() ?: $process->output()));
-        }
-
-        return trim($process->output());
+        return [
+            'successful' => $process->successful(),
+            'output' => trim($process->output() . "\n" . $process->errorOutput()),
+        ];
     }
 
     /**

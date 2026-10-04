@@ -153,6 +153,24 @@
                     </a>
                 </div>
             @endcan
+
+            @if (admin()->canUseCrudGenerator())
+                <div class="menu-item pt-5">
+                    <div class="menu-content">
+                        <span class="menu-section fs-8 fw-bold text-uppercase text-gray-500 ps-1">@lang('backend.titles.developer')</span>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <a href="{{ route('backend.crud_generator.index') }}"
+                        class="menu-link {{ request()->routeIs('backend.crud_generator.*') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i class="ki-outline ki-code fs-2"></i>
+                        </span>
+                        <span class="menu-title">@lang('backend.titles.crud_generator')</span>
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
 </div>
