@@ -30,6 +30,7 @@ Running a seeder twice does not duplicate data: records whose slug (or, without 
 - Slugs are normalised with `Str::slug()` and made unique against the database and the batch.
 - Dates fall back to today, order to the record position, status to active.
 - Missing photos produce a warning, not an error.
+- Gemini overload (503 etc.) is retried twice, then the request falls back to `gemini-3.5-flash-lite`; the seeder page shows which model was used.
 
 All files of one generation are written atomically (CRUD generator `Writer`: path guard, no overwrite, rollback).
 

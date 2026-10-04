@@ -7,7 +7,9 @@ use App\Models\AiSetting;
 use App\Models\Blog;
 use App\Models\Document;
 use App\Models\Language;
+use App\Services\SmartSeeder\GeminiClient;
 use App\Services\SmartSeeder\SmartSeeder;
+use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Cache;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Sleep;
 use Spatie\Permission\Models\Role;
 use Tests\Feature\CrudGenerator\InteractsWithSandbox;
 use Tests\TestCase;
@@ -90,14 +93,15 @@ class SmartSeederTest extends TestCase
         return ['records' => $records];
     }
 
-    private function fakeApis(array $aiResponse): void
+    private function fakeApis(array $aiResponse, ?callable $gemini = null): void
     {
         $image = $this->jpeg();
+        $success = Http::response([
+            'candidates' => [['content' => ['parts' => [['text' => json_encode($aiResponse)]]], 'finishReason' => 'STOP']],
+        ]);
 
         Http::fake([
-            'generativelanguage.googleapis.com/*' => Http::response([
-                'candidates' => [['content' => ['parts' => [['text' => json_encode($aiResponse)]]], 'finishReason' => 'STOP']],
-            ]),
+            'generativelanguage.googleapis.com/*' => $gemini ?? $success,
             'pixabay.com/api/*' => function (Request $request) {
                 $seed = crc32($request->url());
 
@@ -251,6 +255,64 @@ class SmartSeederTest extends TestCase
             ->post(route('backend.smart_seeder.store'), ['module' => 'Blog', 'count' => 2, 'instruction' => 'Anything'])
             ->assertSessionHas('error', fn ($message) => str_contains($message, 'rate limit')
                 && !str_contains($message, "'") && !str_contains($message, "\n"));
+
+        $this->assertDirectoryDoesNotExist($this->sandboxPath('database/seeders/Smart'));
+    }
+
+    private function overloaded(): PromiseInterface
+    {
+        return Http::response(['error' => ['message' => 'This model is currently experiencing high demand.']], 503);
+    }
+
+    private function geminiSuccess(array $aiResponse): PromiseInterface
+    {
+        return Http::response([
+            'candidates' => [['content' => ['parts' => [['text' => json_encode($aiResponse)]]], 'finishReason' => 'STOP']],
+        ]);
+    }
+
+    public function test_overloaded_gemini_is_retried(): void
+    {
+        Sleep::fake();
+        $calls = 0;
+        $records = $this->aiRecords(1);
+
+        $this->fakeApis($records, function () use (&$calls, $records) {
+            return ++$calls === 1 ? $this->overloaded() : $this->geminiSuccess($records);
+        });
+
+        $class = $this->generate(1);
+
+        $this->assertSame(2, $calls);
+        Sleep::assertSleptTimes(1);
+        $this->assertSame('gemini-3.8-flash', SmartSeeder::make()->find($class)['meta']['ai_model']);
+    }
+
+    public function test_falls_back_to_the_lighter_model_when_overloaded(): void
+    {
+        Sleep::fake();
+        $records = $this->aiRecords(1);
+
+        $this->fakeApis($records, fn (Request $request) => str_contains($request->url(), '/models/gemini-3.8-flash:')
+            ? $this->overloaded()
+            : $this->geminiSuccess($records));
+
+        $class = $this->generate(1);
+
+        $this->assertSame(GeminiClient::FALLBACK_MODEL, SmartSeeder::make()->find($class)['meta']['ai_model']);
+        $this->assertTrue(session()->has('smart_seeder_warnings'));
+        Http::assertSentCount(3 + 1 + 2);
+    }
+
+    public function test_persistent_overload_reports_a_clear_error_and_writes_nothing(): void
+    {
+        Sleep::fake();
+        $this->fakeApis([], fn () => $this->overloaded());
+
+        $this->actingAs($this->developer, 'admin')
+            ->from(route('backend.smart_seeder.index'))
+            ->post(route('backend.smart_seeder.store'), ['module' => 'Blog', 'count' => 2, 'instruction' => 'Anything'])
+            ->assertSessionHas('error', fn ($message) => str_contains($message, 'overloaded'));
 
         $this->assertDirectoryDoesNotExist($this->sandboxPath('database/seeders/Smart'));
     }

@@ -86,6 +86,11 @@ final class SmartSeeder
         );
 
         $warnings = [];
+        $usedModel = $this->gemini->lastModel ?? $settings->gemini_model;
+
+        if ($usedModel !== ($settings->gemini_model ?: AiSetting::DEFAULT_GEMINI_MODEL)) {
+            $warnings[] = "{$settings->gemini_model} was overloaded, the data was generated with {$usedModel}.";
+        }
         $records = $this->normalize($spec, $locales, (array) ($data['records'] ?? []), $count, $warnings);
         $class = $spec->name . 'SmartSeeder' . now()->format('YmdHis');
 
@@ -126,7 +131,7 @@ final class SmartSeeder
                 'collections' => collect($spec->imageFields())->mapWithKeys(fn (FieldSpec $field) => [$field->name => $spec->imageCollection($field)])->all(),
                 'instruction' => $instruction,
                 'count' => count($records),
-                'ai_model' => $settings->gemini_model,
+                'ai_model' => $usedModel,
                 'generated_at' => now()->toIso8601String(),
             ],
             'records' => $records,
