@@ -1,0 +1,108 @@
+{
+    "modules": [
+        {
+            "name": "Service",
+            "key": "services",
+            "generated_at": "2026-10-04T13:01:05+00:00",
+            "spec": {
+                "name": "Service",
+                "plural": "Services",
+                "label": "Services",
+                "icon": "element-11",
+                "slug": true,
+                "publish_date": false,
+                "order": true,
+                "status": true,
+                "fields": [
+                    {
+                        "name": "title",
+                        "label": "Title",
+                        "type": "string",
+                        "required": true,
+                        "translatable": true,
+                        "max_length": 255,
+                        "quill": false
+                    },
+                    {
+                        "name": "description",
+                        "label": "Description",
+                        "type": "textarea",
+                        "required": false,
+                        "translatable": true,
+                        "max_length": null,
+                        "quill": true
+                    },
+                    {
+                        "name": "image",
+                        "label": "Image",
+                        "type": "image",
+                        "required": false,
+                        "translatable": false,
+                        "max_length": null,
+                        "quill": false
+                    }
+                ]
+            },
+            "files": [
+                "database/migrations/2026_10_04_130105_create_services_table.php",
+                "database/migrations/2026_10_04_130106_create_service_translations_table.php",
+                "app/Models/Service.php",
+                "app/Models/ServiceTranslation.php",
+                "app/Http/Requests/Backend/StoreServiceRequest.php",
+                "app/Http/Requests/Backend/UpdateServiceRequest.php",
+                "app/Http/Controllers/Backend/ServiceController.php",
+                "resources/views/backend/services/index.blade.php",
+                "resources/views/backend/services/tables/index.blade.php",
+                "resources/views/backend/services/form.blade.php",
+                "resources/views/backend/services/show.blade.php",
+                "resources/views/backend/services/tables/show.blade.php"
+            ],
+            "regions": [
+                {
+                    "path": "routes/backend.php",
+                    "marker": "// crud-generator:start Service"
+                },
+                {
+                    "path": "resources/views/backend/includes/sidebar.blade.php",
+                    "marker": "{{-- crud-generator:start Service --}}"
+                },
+                {
+                    "path": "database/seeders/PermissionSeeder.php",
+                    "marker": "// crud-generator:start Service"
+                },
+                {
+                    "path": "app/Providers/AppServiceProvider.php",
+                    "marker": "// crud-generator:start Service"
+                },
+                {
+                    "path": "app/Services/UploadDocumentService.php",
+                    "marker": "// crud-generator:start Service"
+                },
+                {
+                    "path": "lang/az/backend.php",
+                    "marker": "// crud-generator:start Service titles"
+                },
+                {
+                    "path": "lang/az/backend.php",
+                    "marker": "// crud-generator:start Service labels"
+                },
+                {
+                    "path": "lang/en/backend.php",
+                    "marker": "// crud-generator:start Service titles"
+                },
+                {
+                    "path": "lang/en/backend.php",
+                    "marker": "// crud-generator:start Service labels"
+                },
+                {
+                    "path": "lang/ru/backend.php",
+                    "marker": "// crud-generator:start Service titles"
+                },
+                {
+                    "path": "lang/ru/backend.php",
+                    "marker": "// crud-generator:start Service labels"
+                }
+            ]
+        }
+    ]
+}

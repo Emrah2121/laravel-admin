@@ -36,6 +36,11 @@ return array(
         ),
     'labels' =>
         array(
+            // crud-generator:start Service labels
+            'services_title' => 'Title',
+            'services_description' => 'Description',
+            'services_image' => 'Image',
+            // crud-generator:end Service labels
             'yes' => 'Bəli',
             'no' => 'Xeyr',
             'documents' => 'Fayllar',
@@ -183,6 +188,9 @@ return array(
         ),
     'titles' =>
         array(
+            // crud-generator:start Service titles
+            'services' => 'Services',
+            // crud-generator:end Service titles
             'export' => 'Fayl növünü seçin',
             'admins' => 'İstifadəçilər',
             'blogs' => 'Xəbərlər',

@@ -51,6 +51,9 @@ class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             'admin' => Admin::class,
             'blog' => Blog::class,
+            // crud-generator:start Service
+            'service' => \App\Models\Service::class,
+            // crud-generator:end Service
         ]);
     }
 }

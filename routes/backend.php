@@ -40,6 +40,10 @@ Route::group(['middleware' => ['auth:admin']], function () {
     Route::resource('/settings', SettingController::class);
     Route::resource('/blogs', BlogController::class);
 
+    // crud-generator:start Service
+    Route::resource('/services', \App\Http\Controllers\Backend\ServiceController::class);
+    // crud-generator:end Service
+
     Route::resource('/admins', AdminController::class)->except('show');
     Route::resource('/roles', RoleController::class);
     Route::resource('/permissions', PermissionController::class);

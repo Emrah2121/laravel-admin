@@ -24,6 +24,9 @@ class PermissionSeeder extends Seeder
             'settings',
             'blogs',
             'logs',
+            // crud-generator:start Service
+            'services',
+            // crud-generator:end Service
         ];
 
         $actions = [

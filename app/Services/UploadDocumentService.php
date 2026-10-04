@@ -31,6 +31,9 @@ class UploadDocumentService
             // Images
             'avatar' => $standardImage,
             'blog_images' => $standardImage,
+            // crud-generator:start Service
+            'service_image' => $standardImage,
+            // crud-generator:end Service
 
             // Documents
             'certificate_pdf' => $pdf5MB,

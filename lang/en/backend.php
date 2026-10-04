@@ -36,6 +36,11 @@ return array(
         ),
     'labels' =>
         array(
+            // crud-generator:start Service labels
+            'services_title' => 'Title',
+            'services_description' => 'Description',
+            'services_image' => 'Image',
+            // crud-generator:end Service labels
             'yes' => 'Yes',
             'no' => 'No',
             'documents' => 'Documents',
@@ -183,6 +188,9 @@ return array(
         ),
     'titles' =>
         array(
+            // crud-generator:start Service titles
+            'services' => 'Services',
+            // crud-generator:end Service titles
             'export' => 'Select File Type',
             'admins' => 'Users',
             'blogs' => 'News',

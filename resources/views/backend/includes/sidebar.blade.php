@@ -42,6 +42,20 @@
                 </div>
             @endcan
 
+            {{-- crud-generator:start Service --}}
+            @can('services index')
+                <div class="menu-item">
+                    <a href="{{ route('backend.services.index') }}"
+                        class="menu-link {{ request()->routeIs('backend.services.*') ? 'active' : '' }}">
+                        <span class="menu-icon">
+                            <i class="ki-outline ki-element-11 fs-2"></i>
+                        </span>
+                        <span class="menu-title">@lang('backend.titles.services')</span>
+                    </a>
+                </div>
+            @endcan
+            {{-- crud-generator:end Service --}}
+
             @if (admin()->can('admins index') || admin()->can('roles index') || admin()->can('permissions index'))
                 <div class="menu-item pt-5">
                     <div class="menu-content">
