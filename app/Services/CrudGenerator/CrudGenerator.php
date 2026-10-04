@@ -8,7 +8,9 @@ use App\Services\CrudGenerator\Generators\MigrationGenerator;
 use App\Services\CrudGenerator\Generators\ModelGenerator;
 use App\Services\CrudGenerator\Generators\RequestGenerator;
 use App\Services\CrudGenerator\Generators\ViewGenerator;
+use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -204,7 +206,7 @@ final class CrudGenerator
             return;
         }
 
-        $process = Process::path(base_path())->run(array_merge(
+        $process = $this->process()->run(array_merge(
             [$this->php(), base_path('vendor/laravel/pint/builds/pint'), '--config=' . $this->pintConfig],
             $files
         ));
@@ -220,7 +222,7 @@ final class CrudGenerator
     private function lint(array $paths): void
     {
         foreach ($this->phpFiles($paths) as $file) {
-            $process = Process::run([$this->php(), '-l', $file]);
+            $process = $this->process()->run([$this->php(), '-l', $file]);
 
             if (!$process->successful()) {
                 throw new CrudGeneratorException('Syntax error in generated file: ' . trim($process->output() . $process->errorOutput()));
@@ -233,7 +235,7 @@ final class CrudGenerator
      */
     private function artisan(array $arguments): array
     {
-        $process = Process::path(base_path())->timeout(300)->run(array_merge([$this->php(), 'artisan'], $arguments));
+        $process = $this->process()->timeout(300)->run(array_merge([$this->php(), 'artisan'], $arguments));
 
         return [
             'successful' => $process->successful(),
@@ -249,6 +251,19 @@ final class CrudGenerator
         $files = array_filter($paths, fn ($path) => str_ends_with($path, '.php') && !str_ends_with($path, '.blade.php'));
 
         return array_values(array_map(fn ($path) => $this->writer->path($path), $files));
+    }
+
+    /**
+     * "php artisan serve" does not pass TEMP/TMP to the web process, so child
+     * processes would fall back to an unwritable system directory and the Pint
+     * phar could not extract itself. Give them a temp directory explicitly.
+     */
+    private function process(): PendingProcess
+    {
+        $temp = storage_path('framework/cache/crud-generator');
+        File::ensureDirectoryExists($temp);
+
+        return Process::path(base_path())->env(['TMP' => $temp, 'TEMP' => $temp, 'TMPDIR' => $temp]);
     }
 
     private function php(): string

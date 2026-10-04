@@ -112,6 +112,23 @@ class GeneratorOutputTest extends TestCase
         $this->assertArrayHasKey('name', $errors);
     }
 
+    public function test_child_processes_get_a_writable_temp_directory(): void
+    {
+        // "php artisan serve" strips TEMP/TMP; without them the Pint phar cannot extract itself.
+        Process::fake();
+
+        CrudGenerator::make()->generate($this->sampleSpec());
+
+        $temp = storage_path('framework/cache/crud-generator');
+
+        Process::assertRan(fn ($process) => str_contains(implode(' ', (array) $process->command), 'pint')
+            && ($process->environment['TEMP'] ?? null) === $temp
+            && ($process->environment['TMP'] ?? null) === $temp);
+        Process::assertRan(fn ($process) => in_array('-l', (array) $process->command, true)
+            && ($process->environment['TEMP'] ?? null) === $temp);
+        $this->assertDirectoryExists($temp);
+    }
+
     public function test_concurrent_generation_is_refused(): void
     {
         $lock = Cache::lock('crud-generator', 10);
